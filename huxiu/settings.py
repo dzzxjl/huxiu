@@ -21,6 +21,7 @@ NEWSPIDER_MODULE = 'huxiu.spiders'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
+ITEM_PIPELINES = {'huxiu.pipelines.HuxiuPipeline': 300}
 
 FEED_URI=u'/Users/dzzxjl/PycharmProjects/huxiu.txt'
 FEED_FORMAT='TXT'
