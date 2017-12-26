@@ -6,17 +6,29 @@ from huxiu.items import HuxiuItem
 
 class Huxiu(CrawlSpider):
     name = 'huxiu'
-    start_urls = ['https://www.huxiu.com/article/227116.html']
+    url_list = []
+    with open("./huxiu_103_list_1.txt", 'r') as file:
+        for line in file:
+            # print(line)
+            line = line.strip("\n")
+            url_list.append(line)
+    # start_urls = ['https://www.huxiu.com/article/227116.html']
+    start_urls = ['https://www.huxiu.com/article/' + x + '.html' for x in url_list]
+
+    # def parse(self, response):
+    #     yield scrapy.Request("https://www.huxiu.com/article/227184.html", callback=self.parse_content)
+
 
     def parse(self, response):
+
         item = HuxiuItem()
         selector = scrapy.Selector(response)
         # print(response)
         title = str(selector.xpath('//h1[@class="t-h1"]/text()').extract()[0]).strip('\n').strip()
-        time = selector.xpath('//span[@class="article-time pull-left"]/text()').extract()[0]
+        time = selector.xpath('//span[@class="article-time pull-left"]/text() | //span[@class="article-time"]/text()').extract()[0]
         author = selector.xpath('//span[@class="author-name"]/a/text()').extract()[0]
-        collection_num = selector.xpath('//span[@class="article-share pull-left"]/text()').extract()[0].strip("收藏")
-        comment_num = selector.xpath('//span[@class="article-pl pull-left"]/text()').extract()[0].strip("评论")
+        collection_num = selector.xpath('//span[@class="article-share pull-left"]/text() | //span[@class="article-share"]/text()').extract()[0].strip("收藏")
+        comment_num = selector.xpath('//span[@class="article-pl pull-left"]/text() | //span[@class="article-pl"]/text()').extract()[0].strip("评论")
         content = selector.xpath('//div[@class="article-content-wrap"]/p/text()').extract()
 
         content_all = ''
@@ -43,7 +55,12 @@ class Huxiu(CrawlSpider):
         item['category'] = category
 
         yield item
-# class Jianshu(CrawlSpider):
+        url_next = "https://www.huxiu.com" + selector.xpath('//div[@class="hot-article-img"]/a/@href').extract()[0]
+        print("@@@@@@@@@@@@@@@2", url_next)
+        yield scrapy.Request(url_next, callback=self.parse)
+
+
+        # class Jianshu(CrawlSpider):
 #     # 用于区别Spider。 该名字必须是唯一的，您不可以为不同的Spider设定相同的名字
 #     name='huxiu'
 #     # 包含了Spider在启动时进行爬取的url列表。 因此，第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取
