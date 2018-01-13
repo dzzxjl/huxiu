@@ -8,7 +8,6 @@ import pymysql
 
 class HuxiuPipeline(object):
     def process_item(self, item, spider):
-        print("hahahaah@@@@@@")
         db = pymysql.connect(host='39.108.106.20', user='root', password='123456', db='huxiu', charset='utf8')
         cursor = db.cursor()
         # sql = 'INSERT INTO comment(content) VALUES (%s)'
